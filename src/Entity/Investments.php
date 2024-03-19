@@ -23,7 +23,7 @@ class Investments
     private ?User $usuario = null;
 
     #[ORM\ManyToOne(inversedBy: 'investments', targetEntity: SaleProperty::class)]
-    #[ORM\JoinColumn(nullable: true, name: 'rentproperty_id', referencedColumnName: 'inmueble_id')]
+    #[ORM\JoinColumn(nullable: true, name: 'saleproperty_id', referencedColumnName: 'inmueble_id')]
     private ?SaleProperty $sale_property = null;
 
     #[ORM\ManyToOne(inversedBy: 'investments', targetEntity: RentProperty::class)]
