@@ -20,29 +20,30 @@ class SalePropertyRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, SaleProperty::class);
     }
-
-//    /**
-//     * @return SaleProperty[] Returns an array of SaleProperty objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?SaleProperty
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findAllJSON(): ?array
+    {
+        $salesProperty = $this->findAll();
+        $propertyJSON = [];
+        foreach ($salesProperty as $property) {
+            $propertyJSON[$property->getId()] =
+                [
+                    'data' =>
+                    [
+                        'id' => $property->getId(),
+                        'tipo_inmueble' => $property->getTipoInmueble(),
+                        'precio' => $property->getPrecio(),
+                        'direccion' => $property->getDireccion(),
+                        'descripcion' => $property->getDescripcion(),
+                        'informacion_detallada' => $property->getInformacionDetallada(),
+                        'zona' => $property->getZona(),
+                        'disponibilidad' => $property->isDisponibilidad(),
+                        'imagen' => $property->getImagen()
+                    ]
+                ];
+        }
+        if (is_null($propertyJSON)) {
+            return null;
+        }
+        return $propertyJSON;
+    }
 }
