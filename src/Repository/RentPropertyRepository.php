@@ -21,28 +21,30 @@ class RentPropertyRepository extends ServiceEntityRepository
         parent::__construct($registry, RentProperty::class);
     }
 
-//    /**
-//     * @return RentProperty[] Returns an array of RentProperty objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?RentProperty
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findAllJSON(): ?array
+    {
+        $rentsProperty = $this->findAll();
+        $propertyJSON = [];
+        foreach ($rentsProperty as $property) {
+            $propertyJSON[$property->getId()] =
+                [
+                    'data' =>
+                    [
+                        'id' => $property->getId(),
+                        'tipo_inmueble' => $property->getTipoInmueble(),
+                        'precio' => $property->getPrecio(),
+                        'direccion' => $property->getDireccion(),
+                        'descripcion' => $property->getDescripcion(),
+                        'informacion_detallada' => $property->getInformacionDetallada(),
+                        'zona' => $property->getZona(),
+                        'disponibilidad' => $property->isDisponibilidad(),
+                        'imagen' => $property->getImagen()
+                    ]
+                ];
+        }
+        if (is_null($propertyJSON)) {
+            return null;
+        }
+        return $propertyJSON;
+    }
 }
