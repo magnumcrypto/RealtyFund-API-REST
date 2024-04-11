@@ -21,28 +21,20 @@ class InvestmentsRepository extends ServiceEntityRepository
         parent::__construct($registry, Investments::class);
     }
 
-//    /**
-//     * @return Investments[] Returns an array of Investments objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('i.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Investments
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function getCapitalByProperty(?int $idSaleProperty, ?int $idRentProperty): float
+    {
+        if (is_null($idRentProperty)) {
+            $investments = $this->findBy(['sale_property' => $idSaleProperty]);
+        } else {
+            $investments = $this->findBy(['rent_property' => $idRentProperty]);
+        }
+        $capitalAportado = 0;
+        foreach ($investments as $invest) {
+            $capitalAportado += $invest->getCapitalAportado();
+        }
+        if (empty($capitalAportado)) {
+            return 0;
+        }
+        return $capitalAportado;
+    }
 }

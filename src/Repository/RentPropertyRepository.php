@@ -21,11 +21,12 @@ class RentPropertyRepository extends ServiceEntityRepository
         parent::__construct($registry, RentProperty::class);
     }
 
-    public function findAllJSON(): ?array
+    public function findAllJSON(InvestmentsRepository $investmentsRepository): ?array
     {
         $rentsProperty = $this->findAll();
         $propertyJSON = [];
         foreach ($rentsProperty as $property) {
+            $percent = ((int)$investmentsRepository->getCapitalByProperty(null, $property->getId()) === 0) ? 0 : ($investmentsRepository->getCapitalByProperty(null, $property->getId()) * 100) / $property->getPrecio();
             $propertyJSON[$property->getId()] =
                 [
                     'data' =>
@@ -38,7 +39,9 @@ class RentPropertyRepository extends ServiceEntityRepository
                         'informacion_detallada' => $property->getInformacionDetallada(),
                         'zona' => $property->getZona(),
                         'disponibilidad' => $property->isDisponibilidad(),
-                        'imagen' => $property->getImagen()
+                        'imagen' => $property->getImagen(),
+                        'capital_aportado' => $investmentsRepository->getCapitalByProperty(null, $property->getId()),
+                        'porcentaje_invertido' => round($percent)
                     ]
                 ];
         }
