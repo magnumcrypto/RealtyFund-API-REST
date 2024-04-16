@@ -50,4 +50,51 @@ class RentPropertyRepository extends ServiceEntityRepository
         }
         return $propertyJSON;
     }
+    public function findOrderlyPropertiesJSON(object $filters, InvestmentsRepository $investmentsRepository): ?array
+    {
+        if ($filters->disponibilidad !== '1' && $filters->disponibilidad !== '0') {
+            $disponibilidad = [];
+        } else {
+            $disponibilidad = ['disponibilidad' => boolval($filters->disponibilidad)];
+        }
+        $orden_alfabetico = ($filters->orden_alfabetico === '') ? null : $filters->orden_alfabetico;
+        $precio = ($filters->precio === '') ? null : $filters->precio;
+        //dump($disponibilidad, $orden_alfabetico, $precio); // dump($disponibilidad, $orden_alfabetico, $precio
+        $criterios = [];
+        if ($orden_alfabetico !== null) {
+            $criterios['tipo_inmueble'] = $orden_alfabetico;
+        }
+        if ($precio !== null) {
+            $criterios['precio'] = $precio;
+        }
+        $rentsProperty = $this->findBy($disponibilidad, $criterios);
+        if (is_null($rentsProperty)) {
+            return null;
+        }
+        $propertyJSON = [];
+        foreach ($rentsProperty as $property) {
+            $percent = ((int)$investmentsRepository->getCapitalByProperty(null, $property->getId()) === 0) ? 0 : ($investmentsRepository->getCapitalByProperty(null, $property->getId()) * 100) / $property->getPrecio();
+            $propertyJSON[$property->getId()] =
+                [
+                    'data' =>
+                    [
+                        'id' => $property->getId(),
+                        'tipo_inmueble' => $property->getTipoInmueble(),
+                        'precio' => $property->getPrecio(),
+                        'direccion' => $property->getDireccion(),
+                        'descripcion' => $property->getDescripcion(),
+                        'informacion_detallada' => $property->getInformacionDetallada(),
+                        'zona' => $property->getZona(),
+                        'disponibilidad' => $property->isDisponibilidad(),
+                        'imagen' => $property->getImagen(),
+                        'capital_aportado' => $investmentsRepository->getCapitalByProperty(null, $property->getId()),
+                        'porcentaje_invertido' => round($percent)
+                    ]
+                ];
+        }
+        if (is_null($propertyJSON)) {
+            return null;
+        }
+        return $propertyJSON;
+    }
 }
