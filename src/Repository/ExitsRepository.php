@@ -21,28 +21,27 @@ class ExitsRepository extends ServiceEntityRepository
         parent::__construct($registry, Exits::class);
     }
 
-//    /**
-//     * @return Exits[] Returns an array of Exits objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Exits
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findAllJSON(): ?array
+    {
+        $exits = $this->findAll();
+        $exitsJSON = [];
+        foreach ($exits as $exit) {
+            $property = $exit->getSaleProperty();
+            $exitsJSON[$exit->getId()] =
+                [
+                    'data' => [
+                        'tipo_inmueble' => $property->getTipoInmueble(),
+                        'precio_compra' => $exit->getPrecioCompra(),
+                        'precio_venta' => $exit->getPrecioVenta(),
+                        'rentabilidad' => $exit->getRentabilidad(),
+                        'descripcion' => $property->getDescripcion(),
+                        'imagen' => $property->getImagen()
+                    ]
+                ];
+        }
+        if (empty($exitsJSON)) {
+            return null;
+        }
+        return $exitsJSON;
+    }
 }
