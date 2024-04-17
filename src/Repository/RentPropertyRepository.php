@@ -72,9 +72,9 @@ class RentPropertyRepository extends ServiceEntityRepository
             return null;
         }
         $propertyJSON = [];
-        foreach ($rentsProperty as $property) {
+        foreach ($rentsProperty as $key => $property) {
             $percent = ((int)$investmentsRepository->getCapitalByProperty(null, $property->getId()) === 0) ? 0 : ($investmentsRepository->getCapitalByProperty(null, $property->getId()) * 100) / $property->getPrecio();
-            $propertyJSON[$property->getId()] =
+            $propertyJSON[$key] =
                 [
                     'data' =>
                     [
