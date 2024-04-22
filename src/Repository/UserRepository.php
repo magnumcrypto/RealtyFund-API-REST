@@ -20,29 +20,52 @@ class UserRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, User::class);
     }
+    public function save(User $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function remove(User $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function insertUser(object $dataUser): ?User
+    {
+        if (
+            !isset($dataUser->nombre) || !isset($dataUser->apellidos) || !isset($dataUser->direccion)
+            || !isset($dataUser->email)  || !isset($dataUser->telefono) || !isset($dataUser->capital)
+        ) {
+            return null;
+        }
+        $edad = !isset($dataUser->edad) ? null : intval($dataUser->edad);
+        $capitalAportado = floatval($dataUser->capital);
+        $newUser = new User();
+        $newUser
+            ->setNombre($dataUser->nombre)
+            ->setApellidos($dataUser->apellidos)
+            ->setDireccion($dataUser->direccion)
+            ->setEmail($dataUser->email)
+            ->setTelefono($dataUser->telefono)
+            ->setCapitalAportado($capitalAportado)
+            ->setEdad($edad);
+
+        $this->save($newUser, true);
+        $user = $this->findOneBy(
+            [
+                'id' => $newUser->getId(),
+                'email' => $newUser->getEmail()
+            ]
+        );
+        if (is_null($user)) {
+            return null;
+        }
+        return $user;
+    }
 }
