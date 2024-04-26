@@ -27,8 +27,8 @@ class RegistrationController extends AbstractController
         $data = json_decode($request->getContent());
         $user = $registredUserRepo->registerUser($data, $passwordHasher);
         if (!$user) {
-            return new JsonResponse(['error' => 'Datos invalidos'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Datos invalidos', 'status' => 400], Response::HTTP_BAD_REQUEST);
         }
-        return new JsonResponse(['message' => 'Usuario registrado correctamente'], Response::HTTP_CREATED);
+        return new JsonResponse(['message' => 'Usuario registrado correctamente', 'status' => 201], Response::HTTP_CREATED);
     }
 }
