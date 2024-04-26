@@ -21,7 +21,7 @@ class ApiLoginController extends AbstractController
             }
         */
         if (null === $user) {
-            return new JsonResponse(['message' => 'Credenciales invalidas'], Response::HTTP_UNAUTHORIZED);
+            return new JsonResponse(['message' => 'Credenciales invalidas', 'status' => 401], Response::HTTP_UNAUTHORIZED);
         }
 
         $token = 'Hay que crear un token pero no se como';
@@ -29,7 +29,9 @@ class ApiLoginController extends AbstractController
         return new JsonResponse(
             [
                 'message' => $user->getUserIdentifier(),
+                'role' => $user->getRoles(),
                 'token' => $token,
+                'status' => 200
             ],
             Response::HTTP_OK
         );

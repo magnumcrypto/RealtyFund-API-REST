@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\RegistredUser;
 use App\Repository\RegistredUserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
