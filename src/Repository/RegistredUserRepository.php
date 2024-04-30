@@ -42,17 +42,18 @@ class RegistredUserRepository extends ServiceEntityRepository implements Passwor
 
     public function registerUser(object $data, UserPasswordHasherInterface $passwordHasher): bool
     {
-        if (!isset($data->username) || !isset($data->password)) {
+        if (!isset($data->username) || !isset($data->password) || !isset($data->nickname)) {
             return false;
         }
         $user = new RegistredUser();
         $hashedPassword = $passwordHasher->hashPassword($user, $data->password);
         $user
             ->setEmail($data->username)
-            ->setPassword($hashedPassword);
+            ->setPassword($hashedPassword)
+            ->setNickname($data->nickname);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
-        $newUser = $this->findOneBy(['email' => $data->username]);
+        $newUser = $this->findOneBy(['email' => $data->username, 'nickname' => $data->nickname]);
         if (is_null($newUser)) {
             return false;
         }

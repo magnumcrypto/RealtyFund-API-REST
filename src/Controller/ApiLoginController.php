@@ -14,8 +14,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class ApiLoginController extends AbstractController
 {
-    private $passwordHasher;
-    private $JWTManager;
+    private UserPasswordHasherInterface $passwordHasher;
+    private JWTTokenManagerInterface $JWTManager;
 
     public function __construct(UserPasswordHasherInterface $passwordHasher, JWTTokenManagerInterface $JWTManager)
     {
@@ -42,8 +42,7 @@ class ApiLoginController extends AbstractController
 
         return new JsonResponse(
             [
-                'message' => $user->getUserIdentifier(),
-                'role' => $user->getRoles(),
+                'nickname' => $user->getNickname(),
                 'token' => $token,
                 'status' => 200
             ],
