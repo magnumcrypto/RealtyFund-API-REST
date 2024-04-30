@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\RegistredUser;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,7 @@ class ApiLoginController extends AbstractController
         $this->passwordHasher = $passwordHasher;
         $this->JWTManager = $JWTManager;
     }
+
     #[Route('/login', name: 'login', methods: ['POST'])] // Añadir metodo POST si es necesario
     public function login(#[CurrentUser] ?RegistredUser $user, Request $request): JsonResponse
     {
@@ -48,5 +50,16 @@ class ApiLoginController extends AbstractController
             ],
             Response::HTTP_OK
         );
+    }
+
+    #[Route('/logout', name: 'logout', methods: ['POST'])]
+    public function logout(Security $security): JsonResponse
+    {
+        $token = $security->getToken();
+        if (is_null($token)) {
+            return new JsonResponse(['message' => 'User is not logged', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+        }
+        $response = $security->logout(false);
+        return new JsonResponse(['message' => $response, 'status' => 200], Response::HTTP_OK);
     }
 }
