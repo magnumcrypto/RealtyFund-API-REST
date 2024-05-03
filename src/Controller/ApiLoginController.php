@@ -27,12 +27,6 @@ class ApiLoginController extends AbstractController
     #[Route('/login', name: 'login', methods: ['POST'])] // Añadir metodo POST si es necesario
     public function login(#[CurrentUser] ?RegistredUser $user, Request $request): JsonResponse
     {
-        /* 
-            {
-                "username": "dunglas@example.com",
-                "password": "MyPassword"
-            }
-        */
         $dataUser = json_decode($request->getContent());
         if (null === $user) {
             return new JsonResponse(['message' => 'Credenciales invalidas', 'status' => 401], Response::HTTP_UNAUTHORIZED);
@@ -45,6 +39,7 @@ class ApiLoginController extends AbstractController
         return new JsonResponse(
             [
                 'nickname' => $user->getNickname(),
+                'email' => $user->getEmail(),
                 'token' => $token,
                 'status' => 200
             ],
@@ -52,14 +47,9 @@ class ApiLoginController extends AbstractController
         );
     }
 
-    #[Route('/logout', name: 'logout', methods: ['POST'])]
-    public function logout(Security $security): JsonResponse
+    #[Route('/logout', name: 'logout', methods: ['GET'])]
+    public function logout(): JsonResponse
     {
-        $token = $security->getToken();
-        if (is_null($token)) {
-            return new JsonResponse(['message' => 'User is not logged', 'status' => 401], Response::HTTP_UNAUTHORIZED);
-        }
-        $response = $security->logout(false);
-        return new JsonResponse(['message' => $response, 'status' => 200], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Sesión cerrada', 'status' => 200], Response::HTTP_OK);
     }
 }

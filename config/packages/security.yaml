@@ -17,6 +17,7 @@ security:
             pattern: ^/api/login
             stateless: true
             json_login:
+                remember_me: true
                 check_path: /api/login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
@@ -29,7 +30,7 @@ security:
             provider: app_user_provider
             json_login:
                 # api_login is a route we will create below
-                check_path: login
+                check_path: /login
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
