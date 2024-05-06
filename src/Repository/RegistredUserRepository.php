@@ -9,6 +9,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<RegistredUser>
@@ -26,6 +27,14 @@ class RegistredUserRepository extends ServiceEntityRepository implements Passwor
         parent::__construct($registry, RegistredUser::class);
     }
 
+    public function remove(RegistredUser $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */
@@ -58,6 +67,10 @@ class RegistredUserRepository extends ServiceEntityRepository implements Passwor
             return false;
         }
         return true;
+    }
+
+    public function deleteUser(UserInterface $user)
+    {
     }
 
     //    /**

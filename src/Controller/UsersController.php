@@ -2,17 +2,31 @@
 
 namespace App\Controller;
 
+use App\Entity\RegistredUser;
 use App\Repository\InvestmentsRepository;
+use App\Repository\RegistredUserRepository;
 use App\Repository\SalePropertyRepository;
 use App\Repository\UserRepository;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UsersController extends AbstractController
 {
+    private JWTTokenManagerInterface $jwtManager;
+    private TokenStorageInterface $tokenStorageInterface;
+
+    public function __construct(TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager)
+    {
+        $this->jwtManager = $jwtManager;
+        $this->tokenStorageInterface = $tokenStorageInterface;
+    }
+
     #[Route('/users', name: 'app_users_insert', methods: ['POST'])]
     public function insert(Request $request, UserRepository $userRepository, InvestmentsRepository $invRepository, SalePropertyRepository $salePropertyRepository)
     {
@@ -38,5 +52,26 @@ class UsersController extends AbstractController
             ],
             Response::HTTP_ACCEPTED
         );
+    }
+
+    #[Route('/delete', name: 'app_users_delete', methods: ['DELETE'])]
+    public function delete(RegistredUserRepository $userRepo)
+    {
+        $token = $this->tokenStorageInterface->getToken();
+        //dump($token);
+        if (!$token) {
+            return new JsonResponse(['status' => 'No se ha podido obtener el token'], Response::HTTP_UNAUTHORIZED);
+        }
+        $user = $token->getUser();
+        if (!$user instanceof UserInterface) {
+            return new JsonResponse(['status' => 'No se ha podido obtener el usuario'], Response::HTTP_UNAUTHORIZED);
+        }
+        //dump($user);
+        return new JsonResponse([
+            'msg' => 'Usuario eliminado',
+            'user' => $token->getUser(),
+            'status' => 200
+        ], Response::HTTP_OK);
+        //$deleted = $userRepo->deleteUser($user);
     }
 }
