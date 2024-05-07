@@ -69,8 +69,22 @@ class RegistredUserRepository extends ServiceEntityRepository implements Passwor
         return true;
     }
 
-    public function deleteUser(UserInterface $user)
+    public function deleteUser(object $dataUser): bool
     {
+        if (!isset($dataUser)) {
+            return false;
+        }
+        $user = $this->findOneBy(
+            [
+                'email' => $dataUser->username,
+                'nickname' => $dataUser->nickname
+            ]
+        );
+        if (is_null($user)) {
+            return false;
+        }
+        $this->remove($user, true);
+        return true;
     }
 
     //    /**

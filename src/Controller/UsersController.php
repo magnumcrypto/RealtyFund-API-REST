@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class UsersController extends AbstractController
@@ -55,9 +56,9 @@ class UsersController extends AbstractController
     }
 
     #[Route('/delete', name: 'app_users_delete', methods: ['DELETE'])]
-    public function delete(RegistredUserRepository $userRepo)
+    public function delete(Request $request, RegistredUserRepository $userRepo)
     {
-        $token = $this->tokenStorageInterface->getToken();
+        /* $token = $this->tokenStorageInterface->getToken();
         //dump($token);
         if (!$token) {
             return new JsonResponse(['status' => 'No se ha podido obtener el token'], Response::HTTP_UNAUTHORIZED);
@@ -66,12 +67,15 @@ class UsersController extends AbstractController
         if (!$user instanceof UserInterface) {
             return new JsonResponse(['status' => 'No se ha podido obtener el usuario'], Response::HTTP_UNAUTHORIZED);
         }
-        //dump($user);
+        //dump($user); */
+        $dataUser = json_decode($request->getContent());
+        $deleted = $userRepo->deleteUser($dataUser);
+        if (!$deleted) {
+            return new JsonResponse(['status' => 'No se ha podido eliminar el usuario'], Response::HTTP_UNAUTHORIZED);
+        }
         return new JsonResponse([
             'msg' => 'Usuario eliminado',
-            'user' => $token->getUser(),
             'status' => 200
         ], Response::HTTP_OK);
-        //$deleted = $userRepo->deleteUser($user);
     }
 }
