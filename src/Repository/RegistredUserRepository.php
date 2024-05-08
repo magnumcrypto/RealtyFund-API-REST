@@ -56,13 +56,14 @@ class RegistredUserRepository extends ServiceEntityRepository implements Passwor
         }
         $user = new RegistredUser();
         $hashedPassword = $passwordHasher->hashPassword($user, $data->password);
+        $email = strtolower($data->username);
         $user
-            ->setEmail($data->username)
+            ->setEmail($email)
             ->setPassword($hashedPassword)
             ->setNickname($data->nickname);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
-        $newUser = $this->findOneBy(['email' => $data->username, 'nickname' => $data->nickname]);
+        $newUser = $this->findOneBy(['email' => $email, 'nickname' => $data->nickname]);
         if (is_null($newUser)) {
             return false;
         }
@@ -76,7 +77,7 @@ class RegistredUserRepository extends ServiceEntityRepository implements Passwor
         }
         $user = $this->findOneBy(
             [
-                'email' => $dataUser->username,
+                'email' => strtolower($dataUser->username),
                 'nickname' => $dataUser->nickname
             ]
         );

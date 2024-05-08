@@ -51,7 +51,7 @@ class UserRepository extends ServiceEntityRepository
             ->setNombre($dataUser->nombre)
             ->setApellidos($dataUser->apellidos)
             ->setDireccion($dataUser->direccion)
-            ->setEmail($dataUser->email)
+            ->setEmail(strtolower($dataUser->email))
             ->setTelefono($dataUser->telefono)
             ->setCapitalAportado($capitalAportado)
             ->setEdad($edad);
