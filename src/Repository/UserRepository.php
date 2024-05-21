@@ -45,27 +45,36 @@ class UserRepository extends ServiceEntityRepository
             return null;
         }
         $edad = !isset($dataUser->edad) ? null : intval($dataUser->edad);
-        $capitalAportado = floatval($dataUser->capital);
-        $newUser = new User();
-        $newUser
-            ->setNombre($dataUser->nombre)
-            ->setApellidos($dataUser->apellidos)
-            ->setDireccion($dataUser->direccion)
-            ->setEmail(strtolower($dataUser->email))
-            ->setTelefono($dataUser->telefono)
-            ->setCapitalAportado($capitalAportado)
-            ->setEdad($edad);
+        $capitalAportado = floatval(str_replace('.', '', $dataUser->capital));
 
-        $this->save($newUser, true);
-        $user = $this->findOneBy(
-            [
-                'id' => $newUser->getId(),
-                'email' => $newUser->getEmail()
-            ]
-        );
-        if (is_null($user)) {
-            return null;
+        $ifExistsUser = $this->findOneBy(['email' => strtolower($dataUser->email)]);
+        if (!is_null($ifExistsUser)) {
+            $ifExistsUser
+                ->setCapitalAportado($ifExistsUser->getCapitalAportado() + $capitalAportado);
+            $this->save($ifExistsUser, true);
+            return $ifExistsUser;
+        } else {
+            $newUser = new User();
+            $newUser
+                ->setNombre($dataUser->nombre)
+                ->setApellidos($dataUser->apellidos)
+                ->setDireccion($dataUser->direccion)
+                ->setEmail(strtolower($dataUser->email))
+                ->setTelefono($dataUser->telefono)
+                ->setCapitalAportado($capitalAportado)
+                ->setEdad($edad);
+
+            $this->save($newUser, true);
+            $user = $this->findOneBy(
+                [
+                    'id' => $newUser->getId(),
+                    'email' => $newUser->getEmail()
+                ]
+            );
+            if (is_null($user)) {
+                return null;
+            }
+            return $user;
         }
-        return $user;
     }
 }

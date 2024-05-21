@@ -78,4 +78,29 @@ class UsersController extends AbstractController
             'status' => 200
         ], Response::HTTP_OK);
     }
+
+    #[Route('/user-data', name: 'app_userdata', methods: ['POST'])]
+    public function getUserData(Request $request, UserRepository $userRepo)
+    {
+        $data = json_decode($request->getContent());
+        if (!isset($data)) {
+            return new JsonResponse(['msg' => 'Datos incorrectos', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+        }
+        $user = $userRepo->findOneBy(['email' => $data->email]);
+        if (is_null($user)) {
+            return new JsonResponse(['status' => 200, 'ok' => false], Response::HTTP_OK);
+        }
+
+        $userJSON =
+            [
+                'ok' => true,
+                'data' => [
+                    'nombre' => $user->getNombre(),
+                    'apellidos' => $user->getApellidos(),
+                    'direccion' => $user->getDireccion(),
+                    'tel' => $user->getTelefono()
+                ]
+            ];
+        return new JsonResponse($userJSON, Response::HTTP_OK);
+    }
 }
